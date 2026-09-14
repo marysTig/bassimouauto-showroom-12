@@ -13,6 +13,10 @@ import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public.index'
 import { Route as PublicAProposRouteImport } from './routes/_public.a-propos'
 import { Route as PublicContactRouteImport } from './routes/_public.contact'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminParametresRouteImport } from './routes/admin.parametres'
 import { Route as PublicVehiculesIndexRouteImport } from './routes/_public.vehicules.index'
 import { Route as PublicVehiculesIdRouteImport } from './routes/_public.vehicules.$id'
 
@@ -35,6 +39,26 @@ const PublicContactRoute = PublicContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => PublicRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/admin/messages',
+  path: '/admin/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminParametresRoute = AdminParametresRouteImport.update({
+  id: '/admin/parametres',
+  path: '/admin/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublicVehiculesIndexRoute = PublicVehiculesIndexRouteImport.update({
   id: '/vehicules/',
   path: '/vehicules/',
@@ -50,13 +74,21 @@ export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/a-propos': typeof PublicAProposRoute
   '/contact': typeof PublicContactRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/parametres': typeof AdminParametresRoute
+  '/admin/': typeof AdminIndexRoute
   '/vehicules/$id': typeof PublicVehiculesIdRoute
   '/vehicules/': typeof PublicVehiculesIndexRoute
 }
 export interface FileRoutesByTo {
   '/a-propos': typeof PublicAProposRoute
   '/contact': typeof PublicContactRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/parametres': typeof AdminParametresRoute
   '/': typeof PublicIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/vehicules/$id': typeof PublicVehiculesIdRoute
   '/vehicules': typeof PublicVehiculesIndexRoute
 }
@@ -65,27 +97,57 @@ export interface FileRoutesById {
   '/_public': typeof PublicRouteWithChildren
   '/_public/a-propos': typeof PublicAProposRoute
   '/_public/contact': typeof PublicContactRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/parametres': typeof AdminParametresRoute
   '/_public/': typeof PublicIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/_public/vehicules/$id': typeof PublicVehiculesIdRoute
   '/_public/vehicules/': typeof PublicVehiculesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/a-propos' | '/contact' | '/vehicules/$id' | '/vehicules/'
+  fullPaths:
+    | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/admin/login'
+    | '/admin/messages'
+    | '/admin/parametres'
+    | '/admin/'
+    | '/vehicules/$id'
+    | '/vehicules/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/a-propos' | '/contact' | '/' | '/vehicules/$id' | '/vehicules'
+  to:
+    | '/a-propos'
+    | '/contact'
+    | '/admin/login'
+    | '/admin/messages'
+    | '/admin/parametres'
+    | '/'
+    | '/admin'
+    | '/vehicules/$id'
+    | '/vehicules'
   id:
     | '__root__'
     | '/_public'
     | '/_public/a-propos'
     | '/_public/contact'
+    | '/admin/login'
+    | '/admin/messages'
+    | '/admin/parametres'
     | '/_public/'
+    | '/admin/'
     | '/_public/vehicules/$id'
     | '/_public/vehicules/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminParametresRoute: typeof AdminParametresRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -117,6 +179,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/contact'
       preLoaderRoute: typeof PublicContactRouteImport
       parentRoute: typeof PublicRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/admin/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/parametres': {
+      id: '/admin/parametres'
+      path: '/admin/parametres'
+      fullPath: '/admin/parametres'
+      preLoaderRoute: typeof AdminParametresRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_public/vehicules/': {
       id: '/_public/vehicules/'
@@ -156,6 +246,10 @@ const PublicRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminParametresRoute: AdminParametresRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
