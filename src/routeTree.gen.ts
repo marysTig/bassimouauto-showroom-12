@@ -13,6 +13,8 @@ import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public.index'
 import { Route as PublicAProposRouteImport } from './routes/_public.a-propos'
 import { Route as PublicContactRouteImport } from './routes/_public.contact'
+import { Route as PublicVehiculesIndexRouteImport } from './routes/_public.vehicules.index'
+import { Route as PublicVehiculesIdRouteImport } from './routes/_public.vehicules.$id'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -33,16 +35,30 @@ const PublicContactRoute = PublicContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => PublicRoute,
 } as any)
+const PublicVehiculesIndexRoute = PublicVehiculesIndexRouteImport.update({
+  id: '/vehicules/',
+  path: '/vehicules/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicVehiculesIdRoute = PublicVehiculesIdRouteImport.update({
+  id: '/vehicules/$id',
+  path: '/vehicules/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/a-propos': typeof PublicAProposRoute
   '/contact': typeof PublicContactRoute
+  '/vehicules/$id': typeof PublicVehiculesIdRoute
+  '/vehicules/': typeof PublicVehiculesIndexRoute
 }
 export interface FileRoutesByTo {
   '/a-propos': typeof PublicAProposRoute
   '/contact': typeof PublicContactRoute
   '/': typeof PublicIndexRoute
+  '/vehicules/$id': typeof PublicVehiculesIdRoute
+  '/vehicules': typeof PublicVehiculesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,18 +66,22 @@ export interface FileRoutesById {
   '/_public/a-propos': typeof PublicAProposRoute
   '/_public/contact': typeof PublicContactRoute
   '/_public/': typeof PublicIndexRoute
+  '/_public/vehicules/$id': typeof PublicVehiculesIdRoute
+  '/_public/vehicules/': typeof PublicVehiculesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/a-propos' | '/contact'
+  fullPaths: '/' | '/a-propos' | '/contact' | '/vehicules/$id' | '/vehicules/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/a-propos' | '/contact' | '/'
+  to: '/a-propos' | '/contact' | '/' | '/vehicules/$id' | '/vehicules'
   id:
     | '__root__'
     | '/_public'
     | '/_public/a-propos'
     | '/_public/contact'
     | '/_public/'
+    | '/_public/vehicules/$id'
+    | '/_public/vehicules/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -98,6 +118,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicContactRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/vehicules/': {
+      id: '/_public/vehicules/'
+      path: '/vehicules'
+      fullPath: '/vehicules/'
+      preLoaderRoute: typeof PublicVehiculesIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/vehicules/$id': {
+      id: '/_public/vehicules/$id'
+      path: '/vehicules/$id'
+      fullPath: '/vehicules/$id'
+      preLoaderRoute: typeof PublicVehiculesIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
   }
 }
 
@@ -105,12 +139,16 @@ interface PublicRouteChildren {
   PublicAProposRoute: typeof PublicAProposRoute
   PublicContactRoute: typeof PublicContactRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicVehiculesIdRoute: typeof PublicVehiculesIdRoute
+  PublicVehiculesIndexRoute: typeof PublicVehiculesIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
   PublicAProposRoute: PublicAProposRoute,
   PublicContactRoute: PublicContactRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicVehiculesIdRoute: PublicVehiculesIdRoute,
+  PublicVehiculesIndexRoute: PublicVehiculesIndexRoute,
 }
 
 const PublicRouteWithChildren =
