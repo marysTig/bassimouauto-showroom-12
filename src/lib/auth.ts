@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from "react";
 
 /** Identifiants administrateur (à modifier ici si besoin). */
-export const ADMIN_USERNAME = "admin";
-export const ADMIN_PASSWORD = "bassimou2026";
+export const ADMIN_USERNAME = "auto";
+export const ADMIN_PASSWORD = "auto123";
 
 const KEY = "bassimouauto:session";
 
