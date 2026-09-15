@@ -41,24 +41,25 @@ function HomePage() {
           className="absolute inset-0 size-full object-cover"
         />
         <div className="hero-overlay relative">
-          <div className="mx-auto max-w-6xl px-4 py-24 sm:py-32">
+          <div className="mx-auto max-w-6xl px-4 py-24 sm:py-32 text-center sm:text-left flex flex-col items-center sm:items-start">
             <p className="font-display text-sm uppercase tracking-[0.3em] text-primary">
               Seddouk · Béjaïa
             </p>
             <h1 className="mt-4 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-5xl">
-              {dealer.nom} — Votre concessionnaire automobile à Seddouk
+              {dealer.nom} <span className="hidden sm:inline">— </span>
+              <span className="block sm:inline">Votre concessionnaire automobile à Seddouk</span>
             </h1>
             <p className="mt-4 max-w-xl text-lg text-muted-foreground">
               Un large choix de véhicules neufs et d&apos;occasion, contrôlés et livrés avec
               des papiers en règle. Achetez en toute confiance, près de chez vous.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/vehicules"
+            <div className="mt-8 flex flex-wrap justify-center sm:justify-start gap-3">
+              <a
+                href="#dernieres-arrivees"
                 className="rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
               >
                 Voir les véhicules
-              </Link>
+              </a>
               <a
                 href={telHref(dealer.telephone)}
                 className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-sm font-semibold"
@@ -78,7 +79,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16">
+      <section id="dernieres-arrivees" className="mx-auto max-w-6xl px-4 py-16 scroll-mt-20">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display text-3xl font-bold">Nos dernières arrivées</h2>
           <Link to="/vehicules" className="text-sm font-semibold text-primary">

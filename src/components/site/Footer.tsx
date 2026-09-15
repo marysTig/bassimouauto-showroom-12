@@ -10,7 +10,13 @@ export function Footer() {
     <footer className="mt-20 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-3">
         <div>
-          <p className="font-display text-lg font-bold">{dealer.nom}</p>
+          <div className="flex items-center gap-2 mb-4">
+            <img src="/logo.png" alt={`${dealer.nom} Logo`} className="h-8 w-auto object-contain" />
+            <div className="font-display text-lg font-bold">
+              <span className="text-foreground">BASSIMOU</span>
+              <span className="text-primary ml-1">AUTO</span>
+            </div>
+          </div>
           <p className="mt-2 text-sm text-muted-foreground">
             Concessionnaire automobile — véhicules neufs et d&apos;occasion.
           </p>

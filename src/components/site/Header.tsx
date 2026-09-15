@@ -18,9 +18,12 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link to="/" className="font-display text-xl font-bold tracking-tight">
-          {dealer.nom.replace("Auto", "")}
-          <span className="text-primary">Auto</span>
+        <Link to="/" className="flex items-center gap-1 sm:gap-2 font-display text-base sm:text-xl font-bold tracking-tight">
+          <img src="/logo.png" alt={`${dealer.nom} Logo`} className="h-8 sm:h-10 w-auto object-contain" />
+          <div className="flex items-center">
+            <span className="text-foreground">BASSIMOU</span>
+            <span className="text-primary ml-1">AUTO</span>
+          </div>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
