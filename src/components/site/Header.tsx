@@ -18,8 +18,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link to="/" className="flex items-center gap-1 sm:gap-2 font-display text-base sm:text-xl font-bold tracking-tight">
-          <img src="/logo.png" alt={`${dealer.nom} Logo`} className="h-8 sm:h-10 w-auto object-contain" />
+        <Link to="/" className="flex items-center gap-1 sm:gap-2 font-display text-xs sm:text-xl font-bold tracking-tight whitespace-nowrap">
+          <img src="/logo.png" alt={`${dealer.nom} Logo`} className="h-6 sm:h-10 w-auto object-contain" />
           <div className="flex items-center">
             <span className="text-foreground">BASSIMOU</span>
             <span className="text-primary ml-1">AUTO</span>
@@ -43,11 +43,10 @@ export function Header() {
         <div className="flex items-center gap-2">
           <a
             href={telHref(dealer.telephone)}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
+            className="inline-flex size-10 sm:size-auto items-center justify-center gap-2 rounded-lg bg-primary sm:px-3 sm:py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
           >
-            <Phone className="size-4" />
+            <Phone className="size-4 shrink-0" />
             <span className="hidden sm:inline">Appeler maintenant</span>
-            <span className="sm:hidden">Appeler</span>
           </a>
           <button
             type="button"
