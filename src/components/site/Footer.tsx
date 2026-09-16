@@ -1,7 +1,26 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Phone } from "lucide-react";
+import { MapPin, Phone, Facebook, Instagram } from "lucide-react";
 
 import { telHref, useDealer } from "@/lib/store";
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+  );
+}
 
 export function Footer() {
   const dealer = useDealer();
@@ -20,6 +39,35 @@ export function Footer() {
           <p className="mt-2 text-sm text-muted-foreground">
             Concessionnaire automobile — véhicules neufs et d&apos;occasion.
           </p>
+          <div className="mt-6 flex items-center gap-4">
+            <a
+              href="https://www.facebook.com/share/1Dnfvvac2N/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted-foreground hover:text-[#1877F2] transition-colors"
+              aria-label="Facebook"
+            >
+              <Facebook className="size-5" />
+            </a>
+            <a
+              href="https://www.instagram.com/bassimouauto?stkn=NmFzbzlxeGxuMWF6"
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted-foreground hover:text-[#E4405F] transition-colors"
+              aria-label="Instagram"
+            >
+              <Instagram className="size-5" />
+            </a>
+            <a
+              href="https://www.tiktok.com/@bassimou.auto?_r=1&_t=ZS-99mYYzH0qHt"
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="TikTok"
+            >
+              <TikTokIcon className="size-5" />
+            </a>
+          </div>
         </div>
 
         <div className="space-y-2 text-sm flex flex-col items-center sm:items-start">

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { actions, formatDate, useStore } from "@/lib/store";
@@ -42,7 +43,10 @@ function MessagesPage() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => actions.toggleMessage(m.id)}
+                  onClick={() => {
+                    actions.toggleMessage(m.id);
+                    toast.success(m.traite ? "Message marqué comme non traité." : "Message marqué comme traité.");
+                  }}
                   className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold"
                 >
                   Marquer {m.traite ? "non traité" : "traité"}
@@ -50,7 +54,10 @@ function MessagesPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (confirm("Supprimer ce message ?")) actions.deleteMessage(m.id);
+                    if (confirm("Supprimer ce message ?")) {
+                      actions.deleteMessage(m.id);
+                      toast.success("Message supprimé avec succès.");
+                    }
                   }}
                   className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-destructive"
                 >

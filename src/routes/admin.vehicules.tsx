@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { actions, formatPrice, useStore, type Vehicle } from "@/lib/store";
@@ -121,8 +122,10 @@ function AdminVehiclesPage() {
                       type="button"
                       aria-label="Supprimer"
                       onClick={() => {
-                        if (confirm(`Supprimer ${v.marque} ${v.modele} ? Cette action est définitive.`))
+                        if (confirm(`Supprimer ${v.marque} ${v.modele} ? Cette action est définitive.`)) {
                           actions.deleteVehicle(v.id);
+                          toast.success("Véhicule supprimé avec succès.");
+                        }
                       }}
                       className="rounded-lg border border-border p-2 text-destructive"
                     >
@@ -150,6 +153,7 @@ function AdminVehiclesPage() {
               e.preventDefault();
               actions.saveVehicle(form);
               setForm(null);
+              toast.success(form.id ? "Véhicule modifié avec succès." : "Véhicule ajouté avec succès.");
             }}
             className="admin-theme surface-card mx-auto max-w-3xl space-y-4 p-5"
           >

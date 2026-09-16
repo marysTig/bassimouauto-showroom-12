@@ -1,11 +1,30 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, Phone } from "lucide-react";
+import { MessageCircle, Phone, Facebook, Instagram } from "lucide-react";
 
 import heroImage from "@/assets/hero-showroom.jpg";
 import { ContactSection } from "@/components/site/ContactSection";
 import { VehicleCard } from "@/components/site/VehicleCard";
 import { WhyUs } from "@/components/site/WhyUs";
 import { telHref, useStore, whatsappHref } from "@/lib/store";
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+  );
+}
 
 export const Route = createFileRoute("/_public/")({
   head: () => ({
@@ -73,6 +92,36 @@ function HomePage() {
                 className="inline-flex items-center gap-2 rounded-lg bg-whatsapp px-5 py-3 text-sm font-semibold text-whatsapp-foreground"
               >
                 <MessageCircle className="size-4" /> WhatsApp
+              </a>
+            </div>
+            
+            <div className="mt-8 flex items-center justify-center sm:justify-start gap-4">
+              <a
+                href="https://www.facebook.com/share/1Dnfvvac2N/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[#1877F2] hover:opacity-80 transition-opacity bg-white/10 p-2 rounded-full backdrop-blur-sm"
+                aria-label="Facebook"
+              >
+                <Facebook className="size-5" />
+              </a>
+              <a
+                href="https://www.instagram.com/bassimouauto?stkn=NmFzbzlxeGxuMWF6"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[#E4405F] hover:opacity-80 transition-opacity bg-white/10 p-2 rounded-full backdrop-blur-sm"
+                aria-label="Instagram"
+              >
+                <Instagram className="size-5" />
+              </a>
+              <a
+                href="https://www.tiktok.com/@bassimou.auto?_r=1&_t=ZS-99mYYzH0qHt"
+                target="_blank"
+                rel="noreferrer"
+                className="text-white hover:opacity-80 transition-opacity bg-white/10 p-2 rounded-full backdrop-blur-sm"
+                aria-label="TikTok"
+              >
+                <TikTokIcon className="size-5" />
               </a>
             </div>
           </div>
