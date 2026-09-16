@@ -11,7 +11,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-3">
         <div className="flex flex-col items-center sm:items-start">
           <div className="flex items-center justify-center sm:justify-start gap-2 mb-4">
-            <img src="/logo.png" alt={`${dealer.nom} Logo`} className="h-8 w-auto object-contain" />
+            <img src="/logo.png" alt={`${dealer.nom} Logo`} className="h-10 w-auto object-contain bg-black rounded-full px-4 py-1.5" />
             <div className="font-display text-lg font-bold">
               <span className="text-foreground">BASSIMOU</span>
               <span className="text-primary ml-1">AUTO</span>

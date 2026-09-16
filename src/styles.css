@@ -47,19 +47,19 @@
   --radius: 0.75rem;
 
   /* Site public : Custom theme */
-  --background: #08090B;
-  --foreground: #F5F5F5;
-  --surface: #111318;
-  --card: #111318;
-  --card-foreground: #F5F5F5;
-  --popover: #111318;
-  --popover-foreground: #F5F5F5;
+  --background: #FFFFFF;
+  --foreground: #08090B;
+  --surface: #F8F9FA;
+  --card: #FFFFFF;
+  --card-foreground: #08090B;
+  --popover: #FFFFFF;
+  --popover-foreground: #08090B;
   --primary: #F5C400;
   --primary-foreground: #08090B;
-  --secondary: #111318;
-  --secondary-foreground: #F5F5F5;
-  --muted: #111318;
-  --muted-foreground: #8A8F98;
+  --secondary: #F1F3F5;
+  --secondary-foreground: #08090B;
+  --muted: #F1F3F5;
+  --muted-foreground: #6B7280;
   --accent: #F5C400;
   --accent-foreground: #08090B;
   --destructive: oklch(0.58 0.21 25);
@@ -70,8 +70,8 @@
   --warning-foreground: #08090B;
   --whatsapp: oklch(0.66 0.16 152);
   --whatsapp-foreground: #F5F5F5;
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
+  --border: oklch(0 0 0 / 12%);
+  --input: oklch(0 0 0 / 16%);
   --ring: #F5C400;
 }
 

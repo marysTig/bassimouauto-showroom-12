@@ -62,7 +62,7 @@ export interface StoreState {
 export const defaultDealer: Dealer = {
   nom: "BassimouAuto",
   adresse: "N74, Seddouk 06011, Algérie",
-  telephone: "0550 68 69 39",
+  telephone: "07 77 41 46 54",
   maps: "https://www.google.com/maps?q=GMWP%2BCV+Seddouk&output=embed",
 };
 

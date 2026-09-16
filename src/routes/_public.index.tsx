@@ -45,7 +45,7 @@ function HomePage() {
             <p className="font-display text-sm uppercase tracking-[0.3em] text-primary">
               Seddouk · Béjaïa
             </p>
-            <h1 className="mt-4 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-5xl">
+            <h1 className="mt-4 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-5xl text-white">
               {dealer.nom} <span className="hidden sm:inline">— </span>
               <span className="block sm:inline">Votre concessionnaire automobile à Seddouk</span>
             </h1>
