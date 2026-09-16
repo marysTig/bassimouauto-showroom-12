@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { AdminShell } from "@/components/admin/AdminShell";
-import { actions, useStore, type Dealer } from "@/lib/store";
+import { actions, useDealer, type Dealer } from "@/lib/store";
 
 export const Route = createFileRoute("/admin/parametres")({
   head: () => ({
@@ -18,9 +19,9 @@ export const Route = createFileRoute("/admin/parametres")({
 });
 
 function SettingsPage() {
-  const { dealer } = useStore();
+  const dealer = useDealer();
   const [form, setForm] = useState<Dealer>(dealer);
-  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const field =
     "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary";
@@ -28,10 +29,15 @@ function SettingsPage() {
   return (
     <AdminShell title="Informations concessionnaire">
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          actions.saveDealer(form);
-          setSaved(true);
+          setSaving(true);
+          try {
+            await actions.saveDealer(form);
+            toast.success("Informations mises à jour.");
+          } finally {
+            setSaving(false);
+          }
         }}
         className="surface-card max-w-xl space-y-4 p-5"
       >
@@ -48,7 +54,6 @@ function SettingsPage() {
             <input
               value={form[key]}
               onChange={(e) => {
-                setSaved(false);
                 setForm({ ...form, [key]: e.target.value });
               }}
               className={field}
@@ -57,11 +62,11 @@ function SettingsPage() {
         ))}
         <button
           type="submit"
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+          disabled={saving}
+          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
         >
-          Enregistrer
+          {saving ? "Enregistrement…" : "Enregistrer"}
         </button>
-        {saved && <p className="text-sm text-primary">Informations mises à jour.</p>}
       </form>
     </AdminShell>
   );

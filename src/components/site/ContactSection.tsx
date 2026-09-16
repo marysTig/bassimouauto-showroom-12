@@ -17,9 +17,9 @@ export function ContactSection() {
   const field =
     "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    actions.addMessage(form);
+    await actions.addMessage(form);
     const texte = `Bonjour, je suis ${form.nom} (${form.telephone}).\nVéhicule recherché : ${form.vehicule}\n${form.message}`;
     setSent(true);
     window.open(whatsappHref(dealer.telephone, texte), "_blank");

@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { AdminShell } from "@/components/admin/AdminShell";
-import { actions, formatDate, useStore } from "@/lib/store";
+import { actions, formatDate, useMessages } from "@/lib/store";
 
 export const Route = createFileRoute("/admin/messages")({
   head: () => ({
@@ -18,12 +18,15 @@ export const Route = createFileRoute("/admin/messages")({
 });
 
 function MessagesPage() {
-  const { messages } = useStore();
+  const { messages, loading } = useMessages();
   const sorted = [...messages].sort((a, b) => b.createdAt - a.createdAt);
 
   return (
     <AdminShell title="Demandes de contact">
       <div className="space-y-3">
+        {loading && (
+          <p className="text-sm text-muted-foreground">Chargement…</p>
+        )}
         {sorted.map((m) => (
           <div key={m.id} className="surface-card p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -43,8 +46,8 @@ function MessagesPage() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => {
-                    actions.toggleMessage(m.id);
+                  onClick={async () => {
+                    await actions.toggleMessage(m.id, m.traite);
                     toast.success(m.traite ? "Message marqué comme non traité." : "Message marqué comme traité.");
                   }}
                   className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold"
@@ -53,9 +56,9 @@ function MessagesPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
                     if (confirm("Supprimer ce message ?")) {
-                      actions.deleteMessage(m.id);
+                      await actions.deleteMessage(m.id);
                       toast.success("Message supprimé avec succès.");
                     }
                   }}
@@ -74,7 +77,7 @@ function MessagesPage() {
             {m.message && <p className="mt-1 text-sm">{m.message}</p>}
           </div>
         ))}
-        {sorted.length === 0 && (
+        {!loading && sorted.length === 0 && (
           <p className="text-sm text-muted-foreground">Aucune demande pour le moment.</p>
         )}
       </div>

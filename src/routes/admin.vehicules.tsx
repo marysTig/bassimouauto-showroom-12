@@ -4,7 +4,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AdminShell } from "@/components/admin/AdminShell";
-import { actions, formatPrice, useStore, type Vehicle } from "@/lib/store";
+import { uploadImage } from "@/lib/cloudinary";
+import { actions, formatPrice, useVehicles, type Vehicle } from "@/lib/store";
 
 export const Route = createFileRoute("/admin/vehicules")({
   head: () => ({
@@ -47,20 +48,24 @@ const field =
   "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 
 function AdminVehiclesPage() {
-  const { vehicles } = useStore();
+  const { vehicles, loading } = useVehicles();
   const [form, setForm] = useState<Form | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
-  function readFiles(files: FileList | null) {
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setForm((f) =>
-          f ? { ...f, photos: [...f.photos, String(reader.result)] } : f,
-        );
-      };
-      reader.readAsDataURL(file);
-    });
+  async function readFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setUploadingPhotos(true);
+    try {
+      const uploads = await Promise.all(
+        Array.from(files).map((file) => uploadImage(file)),
+      );
+      setForm((f) => (f ? { ...f, photos: [...f.photos, ...uploads] } : f));
+    } catch {
+      toast.error("Erreur lors de l'upload des photos. Vérifiez votre connexion.");
+    } finally {
+      setUploadingPhotos(false);
+    }
   }
 
   return (
@@ -121,9 +126,9 @@ function AdminVehiclesPage() {
                     <button
                       type="button"
                       aria-label="Supprimer"
-                      onClick={() => {
+                      onClick={async () => {
                         if (confirm(`Supprimer ${v.marque} ${v.modele} ? Cette action est définitive.`)) {
-                          actions.deleteVehicle(v.id);
+                          await actions.deleteVehicle(v.id);
                           toast.success("Véhicule supprimé avec succès.");
                         }
                       }}
@@ -135,7 +140,14 @@ function AdminVehiclesPage() {
                 </td>
               </tr>
             ))}
-            {vehicles.length === 0 && (
+            {loading && (
+              <tr>
+                <td colSpan={6} className="p-6 text-center text-muted-foreground">
+                  Chargement…
+                </td>
+              </tr>
+            )}
+            {!loading && vehicles.length === 0 && (
               <tr>
                 <td colSpan={6} className="p-6 text-center text-muted-foreground">
                   Aucun véhicule enregistré.
@@ -149,11 +161,17 @@ function AdminVehiclesPage() {
       {form && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4">
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              actions.saveVehicle(form);
-              setForm(null);
-              toast.success(form.id ? "Véhicule modifié avec succès." : "Véhicule ajouté avec succès.");
+              setSaving(true);
+              try {
+                const isEdit = Boolean(form.id);
+                await actions.saveVehicle(form);
+                setForm(null);
+                toast.success(isEdit ? "Véhicule modifié avec succès." : "Véhicule ajouté avec succès.");
+              } finally {
+                setSaving(false);
+              }
             }}
             className="admin-theme surface-card mx-auto max-w-3xl space-y-4 p-5"
           >
@@ -237,14 +255,20 @@ function AdminVehiclesPage() {
             </div>
 
             <div>
-              <p className="mb-1 text-sm text-muted-foreground">Photos (galerie)</p>
+              <p className="mb-1 text-sm text-muted-foreground">Photos (galerie — uploadées sur Cloudinary)</p>
               <input
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={(e) => readFiles(e.target.files)}
                 className="text-sm"
+                disabled={uploadingPhotos}
               />
+              {uploadingPhotos && (
+                <p className="mt-2 text-sm text-primary animate-pulse">
+                  Upload en cours… veuillez patienter.
+                </p>
+              )}
               <div className="mt-3 flex flex-wrap gap-2">
                 {form.photos.map((p, i) => (
                   <div key={i} className="relative">
@@ -274,9 +298,10 @@ function AdminVehiclesPage() {
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground"
+                disabled={saving}
+                className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
               >
-                Enregistrer
+                {saving ? "Enregistrement…" : "Enregistrer"}
               </button>
             </div>
           </form>

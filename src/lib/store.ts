@@ -1,9 +1,7 @@
-import { useSyncExternalStore } from "react";
+﻿import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-import car1 from "@/assets/car-1.jpg";
-import car2 from "@/assets/car-2.jpg";
-import car3 from "@/assets/car-3.jpg";
-import car4 from "@/assets/car-4.jpg";
+import { supabase } from "./supabase";
 
 export type Etat = "Neuf" | "Occasion";
 export type Boite = "Manuelle" | "Automatique";
@@ -53,12 +51,6 @@ export interface Dealer {
   maps: string;
 }
 
-export interface StoreState {
-  vehicles: Vehicle[];
-  messages: Message[];
-  dealer: Dealer;
-}
-
 export const defaultDealer: Dealer = {
   nom: "BassimouAuto",
   adresse: "N74, Seddouk 06011, Algérie",
@@ -66,210 +58,279 @@ export const defaultDealer: Dealer = {
   maps: "https://www.google.com/maps?q=GMWP%2BCV+Seddouk&output=embed",
 };
 
-const seedVehicles: Vehicle[] = [
-  {
-    id: "v1",
-    marque: "Volkswagen",
-    modele: "Polo",
-    annee: 2022,
-    etat: "Occasion",
-    boite: "Manuelle",
-    carburant: "Essence",
-    kilometrage: 38000,
-    puissance: "6 CV / 1000 cm³",
-    portes: 5,
-    places: 5,
-    couleur: "Blanc",
-    prix: 3200000,
-    negociable: true,
-    origine: "Importée",
-    main: "Première main",
-    papiers: true,
-    statut: "Disponible",
-    featured: true,
-    photos: [car1],
-    createdAt: Date.now() - 100000,
-  },
-  {
-    id: "v2",
-    marque: "Hyundai",
-    modele: "Tucson",
-    annee: 2023,
-    etat: "Neuf",
-    boite: "Automatique",
-    carburant: "Diesel",
-    kilometrage: 0,
-    puissance: "9 CV / 1600 cm³",
-    portes: 5,
-    places: 5,
-    couleur: "Gris argent",
-    prix: 7450000,
-    negociable: false,
-    origine: "Achat local",
-    main: "Première main",
-    papiers: true,
-    statut: "Disponible",
-    featured: true,
-    photos: [car2],
-    createdAt: Date.now() - 90000,
-  },
-  {
-    id: "v3",
-    marque: "Mercedes",
-    modele: "Classe C",
-    annee: 2019,
-    etat: "Occasion",
-    boite: "Automatique",
-    carburant: "Diesel",
-    kilometrage: 92000,
-    puissance: "11 CV / 2000 cm³",
-    portes: 4,
-    places: 5,
-    couleur: "Bleu nuit",
-    prix: 9800000,
-    negociable: true,
-    origine: "Importée",
-    main: "Deuxième main",
-    papiers: true,
-    statut: "Réservé",
-    featured: true,
-    photos: [car3],
-    createdAt: Date.now() - 80000,
-  },
-  {
-    id: "v4",
-    marque: "Toyota",
-    modele: "Yaris",
-    annee: 2018,
-    etat: "Occasion",
-    boite: "Manuelle",
-    carburant: "Essence",
-    kilometrage: 121000,
-    puissance: "5 CV / 1300 cm³",
-    portes: 5,
-    places: 5,
-    couleur: "Rouge",
-    prix: 2450000,
-    negociable: true,
-    origine: "Achat local",
-    main: "Deuxième main",
-    papiers: true,
-    statut: "Vendu",
-    featured: true,
-    photos: [car4],
-    createdAt: Date.now() - 70000,
-  },
-];
-
-const STORAGE_KEY = "bassimouauto:data:v1";
-
-let state: StoreState = {
-  vehicles: seedVehicles,
-  messages: [],
-  dealer: defaultDealer,
+type SupabaseVehicleRow = {
+  id: string;
+  marque: string;
+  modele: string;
+  annee: number;
+  etat: string;
+  boite: string;
+  carburant: string;
+  kilometrage: number;
+  puissance: string;
+  portes: number;
+  places: number;
+  couleur: string;
+  prix: number;
+  negociable: boolean;
+  origine: string;
+  main: string;
+  papiers: boolean;
+  statut: string;
+  featured: boolean;
+  photos: string[];
+  created_at: string;
 };
 
-let hydrated = false;
-const listeners = new Set<() => void>();
+type SupabaseMessageRow = {
+  id: string;
+  nom: string;
+  telephone: string;
+  vehicule: string;
+  message: string;
+  traite: boolean;
+  created_at: string;
+};
 
-function emit() {
-  listeners.forEach((l) => l());
+function mapVehicle(row: SupabaseVehicleRow): Vehicle {
+  return {
+    id: row.id,
+    marque: row.marque,
+    modele: row.modele,
+    annee: row.annee,
+    etat: row.etat as Etat,
+    boite: row.boite as Boite,
+    carburant: row.carburant as Carburant,
+    kilometrage: row.kilometrage,
+    puissance: row.puissance ?? "",
+    portes: row.portes,
+    places: row.places,
+    couleur: row.couleur ?? "",
+    prix: row.prix,
+    negociable: row.negociable,
+    origine: row.origine as Origine,
+    main: row.main as Main,
+    papiers: row.papiers,
+    statut: row.statut as Statut,
+    featured: row.featured,
+    photos: row.photos ?? [],
+    createdAt: new Date(row.created_at).getTime(),
+  };
 }
 
-function persist() {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    /* quota */
-  }
+function mapMessage(row: SupabaseMessageRow): Message {
+  return {
+    id: row.id,
+    nom: row.nom,
+    telephone: row.telephone,
+    vehicule: row.vehicule ?? "",
+    message: row.message ?? "",
+    traite: row.traite,
+    createdAt: new Date(row.created_at).getTime(),
+  };
 }
 
-function hydrate() {
-  if (hydrated || typeof window === "undefined") return;
-  hydrated = true;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Partial<StoreState>;
-      state = {
-        vehicles: parsed.vehicles ?? state.vehicles,
-        messages: parsed.messages ?? state.messages,
-        dealer: { ...defaultDealer, ...(parsed.dealer ?? {}) },
-      };
-      emit();
-    } else {
-      persist();
-    }
-  } catch {
-    /* ignore */
-  }
+// ---- HOOKS ----
+
+export function useVehicles() {
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchVehicles = () => {
+      supabase
+        .from("vehicles")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .then(({ data, error }) => {
+          if (error) {
+            console.error(error);
+            toast.error("Erreur lors du chargement des véhicules.");
+          }
+          if (mounted && data) setVehicles((data as SupabaseVehicleRow[]).map(mapVehicle));
+          if (mounted) setLoading(false);
+        });
+    };
+
+    fetchVehicles();
+
+    const channel = supabase
+      .channel("vehicles-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "vehicles" }, fetchVehicles)
+      .subscribe();
+
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  return { vehicles, loading };
 }
 
-function setState(next: Partial<StoreState>) {
-  state = { ...state, ...next };
-  persist();
-  emit();
-}
+export function useMessages() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
 
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  hydrate();
-  return () => listeners.delete(listener);
-}
+  useEffect(() => {
+    let mounted = true;
 
-const getSnapshot = () => state;
+    const fetchMessages = () => {
+      supabase
+        .from("messages")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .then(({ data, error }) => {
+          if (error) {
+            console.error(error);
+            toast.error("Erreur lors du chargement des messages.");
+          }
+          if (mounted && data) setMessages((data as SupabaseMessageRow[]).map(mapMessage));
+          if (mounted) setLoading(false);
+        });
+    };
 
-export function useStore(): StoreState {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+    fetchMessages();
+
+    const channel = supabase
+      .channel("messages-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, fetchMessages)
+      .subscribe();
+
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  return { messages, loading };
 }
 
 export function useDealer(): Dealer {
-  return useStore().dealer;
+  const [dealer, setDealer] = useState<Dealer>(defaultDealer);
+
+  useEffect(() => {
+    supabase
+      .from("dealer")
+      .select("*")
+      .eq("id", 1)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setDealer({
+            nom: data.nom as string,
+            adresse: data.adresse as string,
+            telephone: data.telephone as string,
+            maps: data.maps as string,
+          });
+        }
+      });
+  }, []);
+
+  return dealer;
 }
 
-const uid = () => Math.random().toString(36).slice(2, 10);
+// Compatibilité pour pages utilisant useStore
+export function useStore() {
+  const { vehicles, loading: vehiclesLoading } = useVehicles();
+  const dealer = useDealer();
+  return { vehicles, messages: [] as Message[], dealer, loading: vehiclesLoading };
+}
+
+// ---- ACTIONS ----
 
 export const actions = {
-  saveVehicle(vehicle: Omit<Vehicle, "id" | "createdAt"> & { id?: string }) {
-    const existing = vehicle.id ? state.vehicles.find((v) => v.id === vehicle.id) : undefined;
-    if (existing) {
-      setState({
-        vehicles: state.vehicles.map((v) =>
-          v.id === existing.id ? ({ ...v, ...vehicle } as Vehicle) : v,
-        ),
-      });
-      return existing.id;
+  async saveVehicle(vehicle: Omit<Vehicle, "id" | "createdAt"> & { id?: string }) {
+    const row = {
+      marque: vehicle.marque,
+      modele: vehicle.modele,
+      annee: vehicle.annee,
+      etat: vehicle.etat,
+      boite: vehicle.boite,
+      carburant: vehicle.carburant,
+      kilometrage: vehicle.kilometrage,
+      puissance: vehicle.puissance,
+      portes: vehicle.portes,
+      places: vehicle.places,
+      couleur: vehicle.couleur,
+      prix: vehicle.prix,
+      negociable: vehicle.negociable,
+      origine: vehicle.origine,
+      main: vehicle.main,
+      papiers: vehicle.papiers,
+      statut: vehicle.statut,
+      featured: vehicle.featured,
+      photos: vehicle.photos,
+    };
+
+    if (vehicle.id) {
+      const { error } = await supabase.from("vehicles").update(row).eq("id", vehicle.id);
+      if (error) {
+        toast.error("Erreur lors de la modification.");
+        throw error;
+      }
+    } else {
+      const { error } = await supabase.from("vehicles").insert(row);
+      if (error) {
+        toast.error("Erreur lors de l'\''ajout.");
+        throw error;
+      }
     }
-    const id = uid();
-    setState({
-      vehicles: [{ ...(vehicle as Vehicle), id, createdAt: Date.now() }, ...state.vehicles],
+  },
+
+  async deleteVehicle(id: string) {
+    const { error } = await supabase.from("vehicles").delete().eq("id", id);
+    if (error) {
+      toast.error("Erreur lors de la suppression.");
+      throw error;
+    }
+  },
+
+  async addMessage(msg: Omit<Message, "id" | "createdAt" | "traite">) {
+    const { error } = await supabase.from("messages").insert({
+      nom: msg.nom,
+      telephone: msg.telephone,
+      vehicule: msg.vehicule,
+      message: msg.message,
+      traite: false,
     });
-    return id;
+    if (error) {
+      toast.error("Erreur lors de l'\''enregistrement du message.");
+      throw error;
+    }
   },
-  deleteVehicle(id: string) {
-    setState({ vehicles: state.vehicles.filter((v) => v.id !== id) });
+
+  async toggleMessage(id: string, currentTraite: boolean) {
+    const { error } = await supabase
+      .from("messages")
+      .update({ traite: !currentTraite })
+      .eq("id", id);
+    if (error) {
+      toast.error("Erreur lors de la mise à jour du message.");
+      throw error;
+    }
   },
-  addMessage(msg: Omit<Message, "id" | "createdAt" | "traite">) {
-    setState({
-      messages: [
-        { ...msg, id: uid(), createdAt: Date.now(), traite: false },
-        ...state.messages,
-      ],
-    });
+
+  async deleteMessage(id: string) {
+    const { error } = await supabase.from("messages").delete().eq("id", id);
+    if (error) {
+      toast.error("Erreur lors de la suppression du message.");
+      throw error;
+    }
   },
-  toggleMessage(id: string) {
-    setState({
-      messages: state.messages.map((m) => (m.id === id ? { ...m, traite: !m.traite } : m)),
-    });
-  },
-  deleteMessage(id: string) {
-    setState({ messages: state.messages.filter((m) => m.id !== id) });
-  },
-  saveDealer(dealer: Dealer) {
-    setState({ dealer });
+
+  async saveDealer(dealer: Dealer) {
+    const { error } = await supabase.from("dealer").update(dealer).eq("id", 1);
+    if (error) {
+      toast.error("Erreur lors de la sauvegarde des paramètres.");
+      throw error;
+    }
   },
 };
+
+// ---- UTILITAIRES ----
 
 export function formatPrice(value: number) {
   return `${new Intl.NumberFormat("fr-DZ").format(value)} DA`;
