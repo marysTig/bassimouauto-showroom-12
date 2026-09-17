@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { supabase } from "./supabase";
@@ -135,39 +135,43 @@ function mapMessage(row: SupabaseMessageRow): Message {
 export function useVehicles() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
+
+  const fetchVehicles = async () => {
+    const { data, error } = await supabase
+      .from("vehicles")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error(error);
+      toast.error("Erreur lors du chargement des véhicules.");
+    }
+    if (mountedRef.current) {
+      if (data) setVehicles((data as SupabaseVehicleRow[]).map(mapVehicle));
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let mounted = true;
-
-    const fetchVehicles = () => {
-      supabase
-        .from("vehicles")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .then(({ data, error }) => {
-          if (error) {
-            console.error(error);
-            toast.error("Erreur lors du chargement des véhicules.");
-          }
-          if (mounted && data) setVehicles((data as SupabaseVehicleRow[]).map(mapVehicle));
-          if (mounted) setLoading(false);
-        });
-    };
-
+    mountedRef.current = true;
     fetchVehicles();
 
     const channel = supabase
       .channel("vehicles-changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "vehicles" }, fetchVehicles)
+      .on("postgres_changes", { event: "*", schema: "public", table: "vehicles" }, () => {
+        if (mountedRef.current) fetchVehicles();
+      })
       .subscribe();
 
     return () => {
-      mounted = false;
+      mountedRef.current = false;
       supabase.removeChannel(channel);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { vehicles, loading };
+  return { vehicles, loading, refetch: fetchVehicles };
 }
 
 export function useMessages() {

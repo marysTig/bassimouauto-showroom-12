@@ -48,7 +48,7 @@ const field =
   "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 
 function AdminVehiclesPage() {
-  const { vehicles, loading } = useVehicles();
+  const { vehicles, loading, refetch } = useVehicles();
   const [form, setForm] = useState<Form | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
@@ -130,6 +130,7 @@ function AdminVehiclesPage() {
                         if (confirm(`Supprimer ${v.marque} ${v.modele} ? Cette action est définitive.`)) {
                           await actions.deleteVehicle(v.id);
                           toast.success("Véhicule supprimé avec succès.");
+                          await refetch();
                         }
                       }}
                       className="rounded-lg border border-border p-2 text-destructive"
@@ -169,6 +170,8 @@ function AdminVehiclesPage() {
                 await actions.saveVehicle(form);
                 setForm(null);
                 toast.success(isEdit ? "Véhicule modifié avec succès." : "Véhicule ajouté avec succès.");
+                // Forcer le rechargement de la liste depuis Supabase
+                await refetch();
               } finally {
                 setSaving(false);
               }
