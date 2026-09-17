@@ -5,7 +5,7 @@ import heroImage from "@/assets/hero-showroom.jpg";
 import { ContactSection } from "@/components/site/ContactSection";
 import { VehicleCard } from "@/components/site/VehicleCard";
 import { WhyUs } from "@/components/site/WhyUs";
-import { telHref, useStore, whatsappHref } from "@/lib/store";
+import { telHref, useDealer, useVehicles, whatsappHref } from "@/lib/store";
 
 function TikTokIcon({ className }: { className?: string }) {
   return (
@@ -46,8 +46,10 @@ export const Route = createFileRoute("/_public/")({
 });
 
 function HomePage() {
-  const { vehicles, dealer } = useStore();
-  const featured = vehicles.filter((v) => v.featured).slice(0, 4);
+  const { vehicles } = useVehicles();
+  const dealer = useDealer();
+  // Les 8 derniers véhicules ajoutés, triés du plus récent au plus ancien
+  const latest = [...vehicles].sort((a, b) => b.createdAt - a.createdAt).slice(0, 8);
 
   return (
     <>
@@ -136,11 +138,11 @@ function HomePage() {
           </Link>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-          {featured.map((v) => (
+          {latest.map((v) => (
             <VehicleCard key={v.id} vehicle={v} />
           ))}
-          {featured.length === 0 && (
-            <p className="text-muted-foreground">Aucun véhicule mis en avant pour le moment.</p>
+          {latest.length === 0 && (
+            <p className="text-muted-foreground col-span-full">Aucun véhicule disponible pour le moment.</p>
           )}
         </div>
       </section>
