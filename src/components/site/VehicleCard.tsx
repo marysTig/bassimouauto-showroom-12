@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar, Fuel, Gauge } from "lucide-react";
+import { Calendar, Fuel, Gauge, X } from "lucide-react";
+import { useState } from "react";
 
 import { formatKm, formatPrice, type Statut, type Vehicle } from "@/lib/store";
 
@@ -16,8 +17,11 @@ export function StatutBadge({ statut }: { statut: Statut }) {
 }
 
 export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
+  const [showImage, setShowImage] = useState(false);
+
   return (
-    <Link
+    <>
+      <Link
       to="/vehicules/$id"
       params={{ id: vehicle.id }}
       className="group surface-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/60"
@@ -28,7 +32,12 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
             src={vehicle.photos[0]}
             alt={`${vehicle.marque} ${vehicle.modele}`}
             loading="lazy"
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowImage(true);
+            }}
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"
           />
         ) : (
           <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
@@ -67,5 +76,38 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         </p>
       </div>
     </Link>
+
+      {showImage && vehicle.photos[0] && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setShowImage(false);
+          }}
+        >
+          <button 
+            type="button"
+            className="absolute top-4 right-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors"
+            onClick={(e) => {
+               e.preventDefault();
+               e.stopPropagation();
+               setShowImage(false);
+            }}
+          >
+             <X className="size-6" />
+          </button>
+          <img 
+             src={vehicle.photos[0]} 
+             alt={`${vehicle.marque} ${vehicle.modele}`}
+             className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl"
+             onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+             }}
+          />
+        </div>
+      )}
+    </>
   );
 }

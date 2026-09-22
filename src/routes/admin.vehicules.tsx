@@ -258,35 +258,32 @@ function AdminVehiclesPage() {
             </div>
 
             <div>
-              <p className="mb-1 text-sm text-muted-foreground">Photos (galerie — uploadées sur Cloudinary)</p>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => readFiles(e.target.files)}
-                className="text-sm"
-                disabled={uploadingPhotos}
-              />
+              <label className="mb-2 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90">
+                <Plus className="size-4" /> Ajouter des photos
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => readFiles(e.target.files)}
+                  className="hidden"
+                  disabled={uploadingPhotos}
+                />
+              </label>
+
               {uploadingPhotos && (
                 <p className="mt-2 text-sm text-primary animate-pulse">
                   Upload en cours… veuillez patienter.
                 </p>
               )}
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-4">
                 {form.photos.map((p, i) => (
-                  <div key={i} className="relative">
-                    <img src={p} alt={`Photo ${i + 1}`} className="size-20 rounded-lg object-cover" />
-                    <button
-                      type="button"
-                      aria-label="Retirer la photo"
-                      onClick={() =>
-                        setForm({ ...form, photos: form.photos.filter((_, j) => j !== i) })
-                      }
-                      className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-destructive-foreground"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </div>
+                  <PhotoPreview
+                    key={i}
+                    src={p}
+                    onRemove={() =>
+                      setForm({ ...form, photos: form.photos.filter((_, j) => j !== i) })
+                    }
+                  />
                 ))}
               </div>
             </div>
@@ -380,5 +377,35 @@ function Select({
         ))}
       </select>
     </label>
+  );
+}
+
+function PhotoPreview({ src, onRemove }: { src: string; onRemove: () => void }) {
+  const [size, setSize] = useState<{w: number, h: number} | null>(null);
+
+  return (
+    <div className="relative border border-border p-2 rounded-lg bg-muted/20 flex flex-col items-center">
+      <img
+        src={src}
+        alt="Aperçu"
+        className="max-h-32 w-auto object-contain rounded"
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          setSize({ w: img.naturalWidth, h: img.naturalHeight });
+        }}
+      />
+      {size && (
+        <span className="mt-1 text-xs font-medium text-muted-foreground">
+          {size.w} × {size.h}
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-destructive-foreground hover:bg-destructive/90"
+      >
+        <X className="size-3" />
+      </button>
+    </div>
   );
 }
